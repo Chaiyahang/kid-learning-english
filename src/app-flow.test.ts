@@ -267,4 +267,41 @@ describe("app flow", () => {
     expect(spoken).toHaveLength(1);
     expect(spoken[0].text).toBe("dragon fruit");
   });
+
+  it("shows the phonetic on the child card for known words", async () => {
+    const wrapper = await mountApp();
+    await wrapper.find("textarea").setValue(SMOOTHIE);
+    await flushPromises();
+    expect(wrapper.find(".preview-phonetic").text()).toBe("/ˈæpəl/");
+
+    await wrapper.find(".primary-button").trigger("click");
+    await flushPromises();
+
+    expect(wrapper.find(".play-english").text()).toBe("apple");
+    expect(wrapper.find(".play-phonetic").text()).toBe("/ˈæpəl/");
+    expect(wrapper.find(".play-chinese").text()).toBe("苹果");
+  });
+
+  it("hides the phonetic for sentences and unknown words", async () => {
+    const wrapper = await mountApp();
+    await pasteAndSave(wrapper);
+
+    for (let i = 0; i < 12; i += 1) {
+      await wrapper.find(".play-nav button:last-child").trigger("click");
+    }
+    expect(wrapper.find(".play-english").text()).toBe("What fruit do you like?");
+    expect(wrapper.find(".play-phonetic").exists()).toBe(false);
+
+    await router.push("/");
+    await flushPromises();
+    await wrapper.find("textarea").setValue("florp 佛洛普");
+    await flushPromises();
+    expect(wrapper.find(".preview-phonetic").exists()).toBe(false);
+
+    await wrapper.find(".primary-button").trigger("click");
+    await flushPromises();
+    expect(wrapper.find(".play-english").text()).toBe("florp");
+    expect(wrapper.find(".play-phonetic").exists()).toBe(false);
+    expect(wrapper.find(".play-chinese").text()).toBe("佛洛普");
+  });
 });

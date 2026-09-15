@@ -8,6 +8,7 @@ import {
   loadPlaySettings,
   savePlaySettings
 } from "../services/settings";
+import { getReviewPhonetic } from "../data/reviewPhonetics";
 
 const route = useRoute();
 const router = useRouter();
@@ -66,6 +67,10 @@ function toggleAutoPlay() {
 function setRepeatCount(count: number) {
   playSettings.value = savePlaySettings({ ...playSettings.value, repeatCount: count });
 }
+
+function previewPhonetic(english: string) {
+  return getReviewPhonetic(english);
+}
 </script>
 
 <template>
@@ -108,7 +113,12 @@ function setRepeatCount(count: number) {
       <p v-else>没识别到英文单词或句子</p>
       <ul v-if="canSave">
         <li v-for="item in previewItems" :key="item.id">
-          <span>{{ item.emoji }} {{ item.english }}</span>
+          <span class="preview-english">
+            {{ item.emoji }} {{ item.english }}
+            <small v-if="previewPhonetic(item.english)" class="preview-phonetic">
+              /{{ previewPhonetic(item.english) }}/
+            </small>
+          </span>
           <small v-if="item.chinese">{{ item.chinese }}</small>
         </li>
       </ul>

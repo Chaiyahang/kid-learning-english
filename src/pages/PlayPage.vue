@@ -5,6 +5,7 @@ import { useLessons } from "../composables/useLessons";
 import { TTS_HINT_KEY, readJson, writeJson } from "../services/storage";
 import { isSpeechSupported, speak, stopSpeaking } from "../services/speech";
 import { loadPlaySettings } from "../services/settings";
+import { getReviewPhonetic } from "../data/reviewPhonetics";
 import type { ReviewItem } from "../types/review";
 
 const router = useRouter();
@@ -30,6 +31,12 @@ const progressPercent = computed(() => {
   const total = activeLesson.value?.items.length || 0;
   if (!total) return 0;
   return ((activeIndex.value + 1) / total) * 100;
+});
+
+const currentPhonetic = computed(() => {
+  const item = activeItem.value;
+  if (!item || item.category !== "word") return "";
+  return getReviewPhonetic(item.english);
 });
 
 function stopPlayback() {
@@ -106,6 +113,7 @@ onBeforeUnmount(stopPlayback);
     </div>
 
     <p class="play-english" :style="englishStyle">{{ activeItem.english }}</p>
+    <p v-if="currentPhonetic" class="play-phonetic">/{{ currentPhonetic }}/</p>
     <p v-if="activeItem.chinese" class="play-chinese">{{ activeItem.chinese }}</p>
     <div class="play-emoji" aria-hidden="true">{{ activeItem.emoji }}</div>
 

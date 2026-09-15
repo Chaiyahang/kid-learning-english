@@ -5,7 +5,7 @@
   "start_url": "./play",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#fff3dc",
+  "background_color": "#cfe3f7",
   "theme_color": "#2d63e8",
   "icons": [
     {
