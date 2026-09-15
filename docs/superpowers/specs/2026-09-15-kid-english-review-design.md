@@ -157,10 +157,19 @@ interface Progress {
 
 ## PWA
 
-- `manifest.webmanifest`：名称「儿童英语复习」，`display: standalone`，`start_url` 为 `/play`。有复习日时从主屏幕打开直接进入孩子页；没有复习日则重定向到 `/`。
+- `manifest.webmanifest`：名称「儿童英语复习」，`display: standalone`，`start_url` 为 `./play`（相对路径，兼容子路径部署）。有复习日时从主屏幕打开直接进入孩子页；没有复习日则重定向到 `/`。
 - `index.html` 带 `apple-mobile-web-app-capable`、禁止缩放的 viewport（避免小孩双指放大把卡片弄乱）。
 - 仅 production 注册 service worker。HTML 网络优先，静态资源缓存优先。
 - 第一版不加「添加到主屏幕」引导条。能装即可。
+
+## 部署
+
+GitHub Pages（仓库子路径 `https://<账号>.github.io/kid-learning-english/`）：
+
+- `pnpm build:pages` 使用 `VITE_DEPLOY_TARGET=github-pages`，`base` 切到 `/kid-learning-english/`；本地与普通构建仍是 `/`。
+- 路由用 `createWebHistory(import.meta.env.BASE_URL)`，service worker 也按 `BASE_URL` 注册，图标与 manifest 在 `index.html` 里用 `%BASE_URL%` 前缀。
+- 客户端路由是 history 模式，Pages 没有服务端 rewrite，因此构建产物把 `index.html` 复制一份成 `404.html` 作为深链回退。`/play` 直接打开时 HTTP 状态是 404，但返回的是应用外壳，SPA 启动后正常渲染。
+- `.github/workflows/pages.yml` 在 main 推送时跑测试、构建并部署；Pages 的 Source 设为 GitHub Actions。
 
 ## 技术结构
 

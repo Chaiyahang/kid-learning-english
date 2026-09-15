@@ -2,6 +2,12 @@
 
 给 4 岁孩子用的课后英语听读工具。家长粘贴老师发来的课堂总结，孩子逐张点卡片听英文发音。
 
+## 线上地址
+
+https://chaiyahang.github.io/kid-learning-english/
+
+手机浏览器打开后「添加到主屏幕」，图标点开直接进孩子页。
+
 ## 本地运行
 
 ```bash
@@ -17,7 +23,13 @@ pnpm dev
 - `/` 家长页：粘贴课堂总结、预览拆词结果、保存复习日。
 - `/play` 孩子页：大卡片听读，只有发音和上一个/下一个。长按左上角约 1 秒回家长页。
 
-数据只存在当前浏览器 `localStorage`，第一版没有云同步。
+数据只存在当前浏览器 `localStorage`，第一版没有云同步。换设备或换浏览器需要重新录入。
+
+## 部署
+
+推送到 `main` 会自动跑测试、构建并部署到 GitHub Pages（见 `.github/workflows/pages.yml`）。子路径构建用 `pnpm build:pages`；本地和普通 `pnpm build` 仍按根路径输出。
+
+客户端路由是 history 模式，Pages 没有服务端 rewrite，所以构建时把 `index.html` 复制为 `404.html` 作深链回退：直接打开 `/play` 时 HTTP 状态为 404，但内容就是应用，页面正常渲染。
 
 ## 验收
 
