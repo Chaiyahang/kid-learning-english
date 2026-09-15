@@ -1,6 +1,273 @@
+:root {
+  color-scheme: light;
+  font-family:
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --ink: #202735;
+  --muted: #667386;
+  --paper: #ffffff;
+  --bg: #cfe3f7;
+  --primary: #2f66ef;
+  --primary-dark: #1f4fd3;
+  --line: #d8e5f2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 html,
 body,
 #app {
-  margin: 0;
   min-height: 100%;
+  width: 100%;
+  margin: 0;
+  touch-action: pan-x pan-y;
+}
+
+body {
+  min-width: 320px;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.page {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 12px 12px calc(16px + env(safe-area-inset-bottom));
+}
+
+.banner {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff4d6;
+  color: #7a5b00;
+  font-size: 14px;
+}
+
+.parent-header,
+.play-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.parent-header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.text-button,
+.primary-button,
+.play-nav button,
+.lesson-delete {
+  border: 0;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.text-button:disabled,
+.primary-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.text-button {
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--primary);
+}
+
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.lesson-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.lesson-row.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(47, 102, 239, 0.2);
+}
+
+.lesson-select {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lesson-select small,
+.preview small {
+  color: var(--muted);
+}
+
+.lesson-delete {
+  margin: 8px;
+  padding: 8px 10px;
+  background: #ff6f61;
+  font-size: 13px;
+}
+
+.paste-label {
+  display: block;
+  margin-top: 8px;
+}
+
+.paste-label textarea {
+  width: 100%;
+  min-height: 160px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  resize: vertical;
+}
+
+.preview {
+  margin: 12px 0 16px;
+}
+
+.preview ul {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preview li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.primary-button {
+  width: 100%;
+  min-height: 48px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.page-play {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.parent-hold {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.play-header {
+  width: 100%;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.play-english {
+  margin: 24px 0 8px;
+  width: 100%;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.play-chinese {
+  margin: 0 0 16px;
+  font-size: 20px;
+  color: var(--muted);
+}
+
+.play-emoji {
+  width: 168px;
+  height: 140px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 28px;
+  background: #fff7e8;
+  font-size: 72px;
+}
+
+.speak-button {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.tts-hint {
+  margin: 0 0 12px;
+  color: #7a5b00;
+  font-size: 14px;
+}
+
+.play-nav {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.play-nav button {
+  flex: 1;
+  min-height: 48px;
+}
+
+.play-nav button:first-child {
+  background: #eef2fb;
+  color: var(--ink);
 }
