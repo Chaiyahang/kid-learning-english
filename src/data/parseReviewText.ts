@@ -1,4 +1,5 @@
 import { findEnglishEmoji } from "./reviewEmojis";
+import { translateSentence } from "./sentencePatterns";
 import type { ItemCategory, ReviewItem } from "../types/review";
 
 export function createReviewId(prefix: string): string {
@@ -101,9 +102,15 @@ export function parseReviewText(rawText: string): ReviewItem[] {
     }));
   });
 
+  const withChinese = parsed.map((item) => {
+    if (item.category !== "sentence" || item.chinese.trim()) return item;
+    const chinese = translateSentence(item.english);
+    return chinese ? { ...item, chinese } : item;
+  });
+
   return assignContextualEmojis(
     dedupeReviewItems(
-      parsed.filter(
+      withChinese.filter(
         (item) =>
           Boolean(item.english) && (item.category === "word" || item.category === "sentence")
       )

@@ -75,7 +75,7 @@ describe("parseReviewText", () => {
     expect(items.map((item) => `${item.english}|${item.chinese}|${item.category}`)).toEqual([
       "apple|苹果|word",
       "pear|梨|word",
-      "I like yogurt.||sentence"
+      "I like yogurt.|我喜欢酸奶。|sentence"
     ]);
   });
 
