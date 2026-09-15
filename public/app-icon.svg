@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="儿童英语复习">
+  <rect width="512" height="512" rx="112" fill="#2f66ef"/>
+  <path d="M104 150c0-16 13-29 29-29h105c22 0 41 9 55 24 14-15 33-24 55-24h31c16 0 29 13 29 29v212c0 16-13 29-29 29h-31c-20 0-38 8-49 22-11-14-29-22-49-22H133c-16 0-29-13-29-29V150Z" fill="#ffffff"/>
+  <path d="M256 168v220" stroke="#bcd2ff" stroke-width="14" stroke-linecap="round"/>
+  <path d="M148 190h72M148 238h72M148 286h56" stroke="#2f66ef" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="372" cy="376" r="76" fill="#ffca3a"/>
+  <path d="M372 336c-21 0-36 13-40 31h80c-4-18-19-31-40-31Zm-42 45h84v13h-84v-13Zm-4 30 46 30 46-30v17l-46 30-46-30v-17Z" fill="#1d2340"/>
+</svg>
