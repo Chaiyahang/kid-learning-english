@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils";
 import App from "./App.vue";
 import { router } from "./router";
@@ -107,5 +107,88 @@ describe("app flow", () => {
 
     expect(wrapper.findAll(".lesson-row")).toHaveLength(0);
     expect(wrapper.find(".text-button").attributes("disabled")).toBeDefined();
+  });
+
+  it("returns to the parent page from the visible header button", async () => {
+    const wrapper = await mountApp();
+    await pasteAndSave(wrapper);
+    expect(router.currentRoute.value.path).toBe("/play");
+
+    const parentLink = wrapper.find(".parent-link");
+    expect(parentLink.exists()).toBe(true);
+    expect(parentLink.text()).toBe("家长");
+
+    await parentLink.trigger("click");
+    await flushPromises();
+
+    expect(router.currentRoute.value.path).toBe("/");
+    expect(wrapper.find("h1").text()).toBe("录入复习");
+  });
+
+  it("fills the progress bar as the child moves through the cards", async () => {
+    const wrapper = await mountApp();
+    await pasteAndSave(wrapper);
+
+    const widthOf = () =>
+      (wrapper.find(".progress-fill").element as HTMLElement).style.width;
+    expect(widthOf()).toBe("6.25%");
+
+    await wrapper.find(".play-nav button:last-child").trigger("click");
+    expect(widthOf()).toBe("12.5%");
+
+    await wrapper.find(".play-nav button:first-child").trigger("click");
+    expect(widthOf()).toBe("6.25%");
+  });
+
+  it("shows the play button as speaking until the utterance ends", async () => {
+    const spoken: Array<{ text: string; onend?: () => void }> = [];
+    const cancel = vi.fn();
+
+    class FakeUtterance {
+      lang = "";
+      pitch = 1;
+      rate = 1;
+      onend: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      constructor(public text: string) {}
+      set endHandler(handler: () => void) {
+        this.onend = handler;
+      }
+    }
+
+    vi.stubGlobal("speechSynthesis", {
+      speak: (utterance: FakeUtterance) => spoken.push(utterance),
+      cancel
+    });
+    vi.stubGlobal("SpeechSynthesisUtterance", FakeUtterance);
+
+    const wrapper = await mountApp();
+    await pasteAndSave(wrapper);
+
+    const button = () => wrapper.find(".speak-button");
+    expect(button().classes()).not.toContain("is-speaking");
+    expect(button().attributes("aria-label")).toBe("播放发音");
+
+    await button().trigger("click");
+    expect(spoken).toHaveLength(1);
+    expect(spoken[0].text).toBe("apple");
+    expect(button().classes()).toContain("is-speaking");
+    expect(button().attributes("aria-label")).toBe("停止发音");
+
+    spoken[0].onend?.();
+    await flushPromises();
+
+    expect(button().classes()).not.toContain("is-speaking");
+    expect(button().attributes("aria-label")).toBe("播放发音");
+
+    await button().trigger("click");
+    await button().trigger("click");
+    await flushPromises();
+
+    expect(cancel).toHaveBeenCalled();
+    expect(button().classes()).not.toContain("is-speaking");
+
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
   });
 });

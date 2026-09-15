@@ -3,12 +3,13 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useLessons } from "../composables/useLessons";
 import { TTS_HINT_KEY, readJson, writeJson } from "../services/storage";
-import { isSpeechSupported, speak } from "../services/speech";
+import { isSpeechSupported, speak, stopSpeaking } from "../services/speech";
 
 const router = useRouter();
 const { activeLesson, activeItem, activeIndex, nextItem, previousItem } = useLessons();
 const ttsHint = ref("");
-let holdTimer: number | null = null;
+const isSpeaking = ref(false);
+let speakRunId = 0;
 
 onMounted(() => {
   if (!activeLesson.value) {
@@ -22,9 +23,26 @@ const englishStyle = computed(() => {
   return { fontSize: `${size}px` };
 });
 
-function handleSpeak() {
+const progressPercent = computed(() => {
+  const total = activeLesson.value?.items.length || 0;
+  if (!total) return 0;
+  return ((activeIndex.value + 1) / total) * 100;
+});
+
+function stopPlayback() {
+  speakRunId += 1;
+  isSpeaking.value = false;
+  stopSpeaking();
+}
+
+async function handleSpeak() {
   const item = activeItem.value;
   if (!item) return;
+
+  if (isSpeaking.value) {
+    stopPlayback();
+    return;
+  }
 
   if (!isSpeechSupported()) {
     if (!readJson<string>(TTS_HINT_KEY, "")) {
@@ -34,52 +52,57 @@ function handleSpeak() {
     return;
   }
 
-  void speak(item.english, {
+  const runId = ++speakRunId;
+  isSpeaking.value = true;
+  await speak(item.english, {
     pitch: 1.12,
     rate: item.category === "sentence" ? 0.7 : 0.78
   });
+
+  if (runId === speakRunId) isSpeaking.value = false;
 }
 
-function startHold() {
-  clearHold();
-  holdTimer = window.setTimeout(() => {
-    router.push("/");
-  }, 1000);
+function goToParent() {
+  stopPlayback();
+  router.push("/");
 }
 
-function clearHold() {
-  if (holdTimer !== null) {
-    window.clearTimeout(holdTimer);
-    holdTimer = null;
-  }
-}
-
-onBeforeUnmount(clearHold);
+onBeforeUnmount(stopPlayback);
 </script>
 
 <template>
   <main v-if="activeLesson && activeItem" class="page page-play">
-    <button
-      class="parent-hold"
-      type="button"
-      aria-label="长按返回家长页"
-      @pointerdown="startHold"
-      @pointerup="clearHold"
-      @pointercancel="clearHold"
-      @pointerleave="clearHold"
-    />
-
     <header class="play-header">
-      <span>{{ activeLesson.dateLabel }}</span>
-      <span>{{ activeIndex + 1 }} / {{ activeLesson.items.length }}</span>
+      <button class="parent-link" type="button" @click="goToParent">家长</button>
+      <span class="play-date">{{ activeLesson.dateLabel }}</span>
+      <span class="play-count">{{ activeIndex + 1 }} / {{ activeLesson.items.length }}</span>
     </header>
+
+    <div
+      class="progress-track"
+      role="progressbar"
+      aria-label="复习进度"
+      :aria-valuemin="1"
+      :aria-valuemax="activeLesson.items.length"
+      :aria-valuenow="activeIndex + 1"
+    >
+      <div class="progress-fill" :style="{ width: `${progressPercent}%` }" />
+    </div>
 
     <p class="play-english" :style="englishStyle">{{ activeItem.english }}</p>
     <p v-if="activeItem.chinese" class="play-chinese">{{ activeItem.chinese }}</p>
     <div class="play-emoji" aria-hidden="true">{{ activeItem.emoji }}</div>
 
-    <button class="speak-button" type="button" aria-label="播放发音" @click="handleSpeak">
-      ▶
+    <button
+      class="speak-button"
+      :class="{ 'is-speaking': isSpeaking }"
+      type="button"
+      :aria-label="isSpeaking ? '停止发音' : '播放发音'"
+      :aria-pressed="isSpeaking"
+      @click="handleSpeak"
+    >
+      <span v-if="isSpeaking" class="speak-stop" aria-hidden="true" />
+      <span v-else aria-hidden="true">▶</span>
     </button>
     <p v-if="ttsHint" class="tts-hint">{{ ttsHint }}</p>
 

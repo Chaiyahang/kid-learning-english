@@ -8,6 +8,11 @@ export function isSpeechSupported(): boolean {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
+export function stopSpeaking(): void {
+  if (!isSpeechSupported()) return;
+  window.speechSynthesis.cancel();
+}
+
 export function speak(text: string, options: SpeakOptions = {}): Promise<void> {
   if (!isSpeechSupported()) return Promise.resolve();
   if (!text.trim()) return Promise.resolve();
