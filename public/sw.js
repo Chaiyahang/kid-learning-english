@@ -11,7 +11,11 @@ const SHELL_URLS = [
   INDEX_URL,
   PLAY_URL,
   new URL("./manifest.webmanifest", APP_SCOPE).href,
-  new URL("./app-icon.svg", APP_SCOPE).href
+  new URL("./app-icon.svg", APP_SCOPE).href,
+  new URL("./icon-192.png", APP_SCOPE).href,
+  new URL("./icon-512.png", APP_SCOPE).href,
+  new URL("./icon-maskable-512.png", APP_SCOPE).href,
+  new URL("./apple-touch-icon.png", APP_SCOPE).href
 ];
 
 self.addEventListener("install", (event) => {

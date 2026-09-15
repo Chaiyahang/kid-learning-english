@@ -1,8 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="儿童英语复习">
-  <rect width="512" height="512" rx="112" fill="#2f66ef"/>
-  <path d="M104 150c0-16 13-29 29-29h105c22 0 41 9 55 24 14-15 33-24 55-24h31c16 0 29 13 29 29v212c0 16-13 29-29 29h-31c-20 0-38 8-49 22-11-14-29-22-49-22H133c-16 0-29-13-29-29V150Z" fill="#ffffff"/>
-  <path d="M256 168v220" stroke="#bcd2ff" stroke-width="14" stroke-linecap="round"/>
-  <path d="M148 190h72M148 238h72M148 286h56" stroke="#2f66ef" stroke-width="16" stroke-linecap="round"/>
-  <circle cx="372" cy="376" r="76" fill="#ffca3a"/>
-  <path d="M372 336c-21 0-36 13-40 31h80c-4-18-19-31-40-31Zm-42 45h84v13h-84v-13Zm-4 30 46 30 46-30v17l-46 30-46-30v-17Z" fill="#1d2340"/>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b94ff"/>
+      <stop offset="1" stop-color="#2f66ef"/>
+    </linearGradient>
+    <linearGradient id="blockFront" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd869"/>
+      <stop offset="1" stop-color="#ffc02e"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#sky)"/>
+
+  <!-- toy block: top face, right face, front face -->
+  <polygon points="88,190 128,150 372,150 332,190" fill="#ffe9a8"/>
+  <polygon points="332,190 372,150 372,394 332,434" fill="#efab12"/>
+  <rect x="88" y="190" width="244" height="244" rx="46" fill="url(#blockFront)"/>
+
+  <!-- letter A -->
+  <g fill="#1f2a44">
+    <polygon points="196,236 222,236 168,392 142,392"/>
+    <polygon points="196,236 222,236 276,392 250,392"/>
+    <rect x="156" y="314" width="104" height="26" rx="8"/>
+  </g>
+
+  <!-- speech bubble with sound waves -->
+  <rect x="286" y="92" width="172" height="118" rx="46" fill="#ffffff"/>
+  <polygon points="322,204 356,204 330,242" fill="#ffffff"/>
+  <g fill="none" stroke="#2f66ef" stroke-width="11" stroke-linecap="round">
+    <path d="M348 128a28 28 0 0 1 0 46"/>
+    <path d="M378 116a52 52 0 0 1 0 70"/>
+    <path d="M408 104a76 76 0 0 1 0 94"/>
+  </g>
+  <circle cx="330" cy="151" r="12" fill="#2f66ef"/>
 </svg>

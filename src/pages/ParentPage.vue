@@ -3,11 +3,18 @@ import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useLessons } from "../composables/useLessons";
 import { parseReviewText } from "../data/parseReviewText";
+import {
+  ALLOWED_REPEAT_COUNTS,
+  loadPlaySettings,
+  savePlaySettings
+} from "../services/settings";
 
 const route = useRoute();
 const router = useRouter();
 const { lessons, activeLesson, storageAvailable, saveLesson, selectLesson, deleteLesson } =
   useLessons();
+
+const playSettings = ref(loadPlaySettings());
 
 const teacherText = ref("");
 const previewItems = computed(() => parseReviewText(teacherText.value));
@@ -47,6 +54,17 @@ function handleDelete(lessonId: string) {
 function goPlay() {
   if (!canPlay.value) return;
   router.push("/play");
+}
+
+function toggleAutoPlay() {
+  playSettings.value = savePlaySettings({
+    ...playSettings.value,
+    autoPlay: !playSettings.value.autoPlay
+  });
+}
+
+function setRepeatCount(count: number) {
+  playSettings.value = savePlaySettings({ ...playSettings.value, repeatCount: count });
 }
 </script>
 
@@ -99,5 +117,44 @@ function goPlay() {
     <button class="primary-button" type="button" :disabled="!canSave" @click="handleSave">
       保存并给孩子复习
     </button>
+
+    <section class="settings-card" aria-label="学习设置">
+      <h2>学习设置</h2>
+      <div class="settings-row">
+        <div class="settings-copy">
+          <strong>自动朗读</strong>
+          <small>切到新卡片时自动发音</small>
+        </div>
+        <button
+          class="switch"
+          :class="{ on: playSettings.autoPlay }"
+          type="button"
+          role="switch"
+          :aria-checked="playSettings.autoPlay"
+          aria-label="自动朗读"
+          @click="toggleAutoPlay"
+        >
+          <span class="knob" />
+        </button>
+      </div>
+      <div class="settings-row" :class="{ disabled: !playSettings.autoPlay }">
+        <div class="settings-copy">
+          <strong>朗读次数</strong>
+          <small>自动朗读时每张卡片念几遍</small>
+        </div>
+        <div class="segmented" role="group" aria-label="朗读次数">
+          <button
+            v-for="count in ALLOWED_REPEAT_COUNTS"
+            :key="count"
+            type="button"
+            :class="{ active: playSettings.repeatCount === count }"
+            :disabled="!playSettings.autoPlay"
+            @click="setRepeatCount(count)"
+          >
+            {{ count }} 次
+          </button>
+        </div>
+      </div>
+    </section>
   </main>
 </template>

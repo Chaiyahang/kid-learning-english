@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useLessons } from "../composables/useLessons";
 import { TTS_HINT_KEY, readJson, writeJson } from "../services/storage";
 import { isSpeechSupported, speak, stopSpeaking } from "../services/speech";
+import { loadPlaySettings } from "../services/settings";
+import type { ReviewItem } from "../types/review";
 
 const router = useRouter();
 const { activeLesson, activeItem, activeIndex, nextItem, previousItem } = useLessons();
 const ttsHint = ref("");
 const isSpeaking = ref(false);
+const playSettings = loadPlaySettings();
 let speakRunId = 0;
 
 onMounted(() => {
@@ -35,6 +38,19 @@ function stopPlayback() {
   stopSpeaking();
 }
 
+async function playItem(item: ReviewItem, repeat: number) {
+  const runId = ++speakRunId;
+  for (let attempt = 0; attempt < repeat; attempt += 1) {
+    if (runId !== speakRunId) return;
+    isSpeaking.value = true;
+    await speak(item.english, {
+      pitch: 1.12,
+      rate: item.category === "sentence" ? 0.7 : 0.78
+    });
+  }
+  if (runId === speakRunId) isSpeaking.value = false;
+}
+
 async function handleSpeak() {
   const item = activeItem.value;
   if (!item) return;
@@ -52,15 +68,15 @@ async function handleSpeak() {
     return;
   }
 
-  const runId = ++speakRunId;
-  isSpeaking.value = true;
-  await speak(item.english, {
-    pitch: 1.12,
-    rate: item.category === "sentence" ? 0.7 : 0.78
-  });
-
-  if (runId === speakRunId) isSpeaking.value = false;
+  await playItem(item, 1);
 }
+
+// Auto-play fires only when the card changes, never on page load: iOS
+// only allows speech after a user gesture, so speaking on mount is muted.
+watch(activeItem, (item) => {
+  if (!item || !playSettings.autoPlay || !isSpeechSupported()) return;
+  void playItem(item, playSettings.repeatCount);
+});
 
 function goToParent() {
   stopPlayback();

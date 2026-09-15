@@ -1,10 +1,41 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils";
 import App from "./App.vue";
 import { router } from "./router";
+import { savePlaySettings } from "./services/settings";
 
 const SMOOTHIE =
   "apple 苹果 / dragon fruit 火龙果 / mango 芒果 / kiwifruit 奇异果 / pineapple 菠萝 / smoothie 冰沙 / ice cube 冰块 / sugar 糖 / syrup 糖浆 / blender 搅拌机 / cup 杯子 / straw 吸管 / What fruit do you like? / I like ... / What do we need to make smoothie? / We need ...";
+
+interface FakeUtterance {
+  text: string;
+  onend?: () => void;
+  onerror?: () => void;
+}
+
+function stubSpeech() {
+  const spoken: FakeUtterance[] = [];
+  const cancel = vi.fn();
+
+  class Utterance {
+    lang = "";
+    pitch = 1;
+    rate = 1;
+    onend?: () => void;
+    onerror?: () => void;
+    constructor(text: string) {
+      this.text = text;
+    }
+  }
+
+  vi.stubGlobal("speechSynthesis", {
+    speak: (utterance: FakeUtterance) => spoken.push(utterance),
+    cancel
+  });
+  vi.stubGlobal("SpeechSynthesisUtterance", Utterance);
+
+  return { spoken, cancel };
+}
 
 async function mountApp(): Promise<VueWrapper> {
   await router.push("/");
@@ -32,6 +63,10 @@ async function pasteAndSave(wrapper: VueWrapper) {
 describe("app flow", () => {
   beforeEach(() => {
     window.localStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("saves teacher text and shows the first card on the child page", async () => {
@@ -190,5 +225,46 @@ describe("app flow", () => {
 
     vi.unstubAllGlobals();
     vi.clearAllMocks();
+  });
+
+  it("auto speaks the configured number of times after switching cards", async () => {
+    const { spoken } = stubSpeech();
+    savePlaySettings({ autoPlay: true, repeatCount: 2 });
+
+    const wrapper = await mountApp();
+    await pasteAndSave(wrapper);
+    expect(spoken).toHaveLength(0);
+
+    await wrapper.find(".play-nav button:last-child").trigger("click");
+    expect(spoken).toHaveLength(1);
+    expect(spoken[0].text).toBe("dragon fruit");
+
+    spoken[0].onend?.();
+    await flushPromises();
+    expect(spoken).toHaveLength(2);
+
+    spoken[1].onend?.();
+    await flushPromises();
+    expect(spoken).toHaveLength(2);
+
+    await wrapper.find(".play-nav button:last-child").trigger("click");
+    expect(spoken).toHaveLength(3);
+    expect(spoken[2].text).toBe("mango");
+  });
+
+  it("keeps manual play silent-triggered only when auto play is off", async () => {
+    const { spoken } = stubSpeech();
+    savePlaySettings({ autoPlay: false, repeatCount: 1 });
+
+    const wrapper = await mountApp();
+    await pasteAndSave(wrapper);
+
+    await wrapper.find(".play-nav button:last-child").trigger("click");
+    await flushPromises();
+    expect(spoken).toHaveLength(0);
+
+    await wrapper.find(".speak-button").trigger("click");
+    expect(spoken).toHaveLength(1);
+    expect(spoken[0].text).toBe("dragon fruit");
   });
 });

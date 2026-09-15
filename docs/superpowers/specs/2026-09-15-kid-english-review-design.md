@@ -68,8 +68,14 @@
 3. 大文本框，占位符：「粘贴老师发来的课堂总结」。
 4. 预览区。输入变化后即时拆词，显示「将拆成 N 个单词 · M 个句子」和条目列表（emoji + 英文 + 中文）。拆不出时显示「没识别到英文单词或句子」，保存按钮禁用。
 5. 主按钮「保存并给孩子复习」。成功后把该复习日设为当前，跳到 `/play`。
+6. 「学习设置」卡片：
+   - 「自动朗读」开关。开启后，孩子页每次切到新卡片自动发音。
+   - 「朗读次数」分段选择 1 / 2 / 3 次，仅在自动朗读开启时可选。
+   - 设置即时保存到 `localStorage`，孩子页下次进入生效。
 
 第一版不提供编辑已有复习日、删除单条词句、改中文释义。可以删除整份复习日：列表项上的删除需二次确认，允许删到零。删光后「给孩子听」禁用。
+
+全局背景色为暖奶油色 `#fff3dc`（对儿童更友好，也适合睡前使用）；卡片、列表保持白底。
 
 日期标签默认用当天，格式 `M月D日`，如 `9月15日`。同一天保存多次则生成多份，标题用 `9月15日复习`、`9月15日复习 2` 以此类推，不覆盖。
 
@@ -87,6 +93,7 @@
   - 播放中：显示方块并按 1.1s 脉冲，`aria-label` 为「停止发音」，再点一下立即停止。
   - 播放结束（`onend`／`onerror`／超时兜底）：回到未播放。
   - 句子语速 0.7，单词 0.78。切换卡片或离开页面时停止朗读。
+- 自动朗读：家长页开启后，`activeItem` 变化（上一张/下一张）时按设定的次数连读。**进入页面不自动播**——iOS 只允许用户手势触发语音，自动播会被静音，还会造成"点开就有声"的不可控体验。手动点发音按钮只播一遍。
 - 底部「上一个」「下一个」，循环到两端（最后一张的下一个回到第一张）。
 - 不显示拼写、音标、参考图片、迷你卡片条、今日学习内容。
 
@@ -99,6 +106,7 @@
 ```
 kid-learning-english.lessons.v1
 kid-learning-english.progress.v1
+kid-learning-english.settings.v1
 kid-learning-english.tts-hint.v1
 ```
 
@@ -165,6 +173,10 @@ interface Progress {
 ## PWA
 
 - `manifest.webmanifest`：名称「儿童英语复习」，`display: standalone`，`start_url` 为 `./play`（相对路径，兼容子路径部署）。有复习日时从主屏幕打开直接进入孩子页；没有复习日则重定向到 `/`。
+- 图标必须提供 PNG：iOS 不认 SVG 的 `apple-touch-icon`，Android 启动器需要 maskable。素材是「字母积木 A + 发音气泡」，源文件 `public/app-icon.svg`（浏览器直接用），PNG 由 `scripts/generate-icons.py` 生成（Pillow，1024px 超采样后缩到目标尺寸）：
+  - `apple-touch-icon.png` 180×180（iOS 主屏幕）
+  - `icon-192.png` / `icon-512.png`（manifest `purpose: any`）
+  - `icon-maskable-512.png`（`purpose: maskable`，内容缩进 80% 安全区）
 - `index.html` 带 `apple-mobile-web-app-capable`、禁止缩放的 viewport（避免小孩双指放大把卡片弄乱）。
 - 仅 production 注册 service worker。HTML 网络优先，静态资源缓存优先。
 - 第一版不加「添加到主屏幕」引导条。能装即可。
