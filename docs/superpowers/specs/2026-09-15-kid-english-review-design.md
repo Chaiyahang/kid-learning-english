@@ -167,6 +167,7 @@ interface Progress {
 封装浏览器语音朗读：
 
 - 有 `window.speechSynthesis` 才调用。
+- **显式挑选英语 voice**：中文系统默认 voice 读英文会串音（只设 `lang` 在 iOS 上经常无效），所以按优先级选 `Samantha`（iOS）→ `Google US English`（Chrome/Android）→ `Microsoft Aria/Jenny`（Edge）→ macOS 内置英语 voice → 任意 `en-US` → 第一个 `en` voice；监听 `voiceschanged`（iOS/Chrome 的 voice 列表异步加载）。设备没有任何英语 voice 时退回默认行为。
 - 每次先 `cancel()` 再朗读，避免连点叠音。
 - `lang: "en-US"`，`pitch: 1.12`。
 - 超时兜底：`max(1800, text.length * 180)` 毫秒后结束 Promise，避免部分浏览器不触发 `onend`。
