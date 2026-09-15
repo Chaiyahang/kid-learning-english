@@ -22,8 +22,9 @@ disablePageZoom();
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator) || !import.meta.env.PROD) return;
+  const baseUrl = import.meta.env.BASE_URL;
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
+    navigator.serviceWorker.register(`${baseUrl}sw.js`, { scope: baseUrl }).catch(() => {});
   });
 }
 

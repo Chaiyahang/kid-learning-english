@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.5.1",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:pages": "VITE_DEPLOY_TARGET=github-pages vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "NODE_OPTIONS=--no-experimental-webstorage vitest run"
   },
