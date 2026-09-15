@@ -9,6 +9,7 @@ import {
   savePlaySettings
 } from "../services/settings";
 import { getReviewPhonetic } from "../data/reviewPhonetics";
+import { SAMPLE_LESSON_TEXT } from "../data/sampleLesson";
 
 const route = useRoute();
 const router = useRouter();
@@ -71,6 +72,10 @@ function setRepeatCount(count: number) {
 function previewPhonetic(english: string) {
   return getReviewPhonetic(english);
 }
+
+function loadSample() {
+  teacherText.value = SAMPLE_LESSON_TEXT;
+}
 </script>
 
 <template>
@@ -101,6 +106,11 @@ function previewPhonetic(english: string) {
         </button>
         <button class="lesson-delete" type="button" @click="handleDelete(lesson.id)">删除</button>
       </div>
+    </section>
+
+    <section v-if="!lessons.length" class="sample-card" aria-label="示例课">
+      <p>还没录入内容？先载入一份示例课，看看拆词和听读的效果。</p>
+      <button class="text-button" type="button" @click="loadSample">载入示例课</button>
     </section>
 
     <label class="paste-label">

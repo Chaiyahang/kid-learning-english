@@ -304,4 +304,34 @@ describe("app flow", () => {
     expect(wrapper.find(".play-phonetic").exists()).toBe(false);
     expect(wrapper.find(".play-chinese").text()).toBe("佛洛普");
   });
+
+  it("loads the built-in sample lesson from the empty state", async () => {
+    const wrapper = await mountApp();
+    const sampleCard = wrapper.find(".sample-card");
+    expect(sampleCard.exists()).toBe(true);
+
+    await sampleCard.find("button").trigger("click");
+    await flushPromises();
+
+    expect(wrapper.find("textarea").element.value).toContain("—相关单词");
+    expect(wrapper.find(".preview p").text()).toBe("将拆成 11 个单词 · 5 个句子");
+
+    await wrapper.find(".primary-button").trigger("click");
+    await flushPromises();
+
+    expect(router.currentRoute.value.path).toBe("/play");
+    expect(wrapper.find(".play-english").text()).toBe("cat");
+    expect(wrapper.find(".play-phonetic").text()).toBe("/kæt/");
+    expect(wrapper.find(".play-emoji").text()).toBe("🐱");
+
+    for (let i = 0; i < 5; i += 1) {
+      await wrapper.find(".play-nav button:last-child").trigger("click");
+    }
+    expect(wrapper.find(".play-english").text()).toBe("red");
+    expect(wrapper.find(".play-emoji").text()).toBe("🔴");
+
+    await wrapper.find(".parent-link").trigger("click");
+    await flushPromises();
+    expect(wrapper.find(".sample-card").exists()).toBe(false);
+  });
 });

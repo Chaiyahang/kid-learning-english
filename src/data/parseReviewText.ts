@@ -274,6 +274,18 @@ function pickEmoji(english: string, chinese: string): string {
     [/zipper|拉链/, "🧥"],
     [/letter|字母/, "🔤"],
     [/number|数字/, "🔢"],
+    [/red|红色/, "🔴"],
+    [/blue|蓝色/, "🔵"],
+    [/yellow|黄色/, "🟡"],
+    [/green|绿色/, "🟢"],
+    [/pink|粉色/, "🌸"],
+    [/\bblack\b|黑色/, "⚫"],
+    [/\bwhite\b|白色/, "⚪"],
+    [/\bone\b|一/, "1️⃣"],
+    [/\btwo\b|二|两/, "2️⃣"],
+    [/\bthree\b|三/, "3️⃣"],
+    [/\bfour\b|四/, "4️⃣"],
+    [/\bfive\b|五/, "5️⃣"],
     [/yuan|rmb|money|price|how much|元|人民币|钱|价格/, "💰"]
   ];
   const matchedEmoji = emojiMap.find(([pattern]) => pattern.test(text))?.[1];

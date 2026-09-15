@@ -149,6 +149,20 @@ textarea {
   margin-top: 8px;
 }
 
+.sample-card {
+  margin: 12px 0 0;
+  padding: 14px 16px;
+  border: 1px dashed rgba(47, 102, 239, 0.4);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.sample-card p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .paste-label textarea {
   width: 100%;
   min-height: 160px;
